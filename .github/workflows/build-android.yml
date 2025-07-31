@@ -111,7 +111,7 @@ jobs:
         MSBuild.exe /p:Configuration=Release /p:Platform="ARM" /p:BUILD_REVISION=${{github.run_number}}
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: otclientv8-android-${{ github.sha }}
         path: android/otclientv8/ARM/Release/otclientv8_armv7a.apk
