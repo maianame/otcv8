@@ -1,6 +1,6 @@
 -- CONFIG
 APP_NAME = "otclientv8"  -- important, change it, it's name for config dir and files in appdata
-APP_VERSION = 1341       -- client version for updater and login to identify outdated client
+APP_VERSION = 1412       -- client version for updater and login to identify outdated client
 DEFAULT_LAYOUT = "retro" -- on android it's forced to "mobile", check code bellow
 
 -- If you don't use updater or other service, set it to updater = ""
@@ -15,7 +15,7 @@ Services = {
 
 -- Servers accept http login url, websocket login url or ip:port:version
 Servers = {
-  LocalTestServ = "127.0.0.1:7171:1100"
+  LocalTestServ = "51.79.84.50:7171:1412"
 }
 
 --Server = "ws://yourwebsite:3000/"
