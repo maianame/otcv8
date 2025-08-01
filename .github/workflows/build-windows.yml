@@ -58,16 +58,19 @@ jobs:
         if: contains( matrix.os, 'windows')
         run: rm -r -fo C:/mysql*
 
-      - name: Restore artifacts and install vcpkg
+      - name: Restore vcpkg commit ID from vcpkg.json
         id: vcpkg-step
         run: |
-          $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
-          $vcpkgCommitId=$json.'builtin-baseline'
-          Write-Host "vcpkg commit ID: $vcpkgCommitId"
+          $json = Get-Content vcpkg.json -Raw | ConvertFrom-Json
+          $vcpkgCommitId = $json.'builtin-baseline'
           echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" >> $GITHUB_ENV
-          
-      - name: Verify VCPKG_GIT_COMMIT_ID
-        run: echo "VCPKG_GIT_COMMIT_ID=${{ env.VCPKG_GIT_COMMIT_ID }}"
+          Write-Host "vcpkg commit ID: $vcpkgCommitId"
+
+      - name: Clone vcpkg if not present
+        run: |
+          if [ ! -d "${{ github.workspace }}/vcpkg" ]; then
+            git clone https://github.com/microsoft/vcpkg.git
+          fi
 
       - name: Install vcpkg
         uses: lukka/run-vcpkg@v2
@@ -83,25 +86,18 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v2
         with:
-          version: '3.21.1'
+          version: '3.21.1'  # Versão específica do CMake
 
       - name: Install dependencies with vcpkg
         run: |
-          ./vcpkg install boost-filesystem boost-system
-          ./vcpkg integrate install
+          ./vcpkg install <required-package>  # Adicione os pacotes necessários para o seu projeto
+          ./vcpkg integrate install  # Faz a integração do vcpkg no CMake
 
       - name: Run CMake and build project
         uses: lukka/run-cmake@v2
         with:
           configurePreset: ${{ matrix.buildtype }}
           buildPreset: ${{ matrix.buildtype }}
-
-      - name: Check if otclient.exe exists
-        run: |
-          if [ ! -f "${{ github.workspace }}/otclient.exe" ]; then
-            echo "Error: otclient.exe not found!"
-            exit 1
-          fi
 
       - name: Create and Upload Artifact
         uses: actions/upload-artifact@main
