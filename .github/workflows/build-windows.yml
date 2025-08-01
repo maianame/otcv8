@@ -80,7 +80,7 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v2
         with:
-          version: '3.21.1'  # Especifica a versão do CMake
+          version: '3.21.1'  # Versão específica do CMake
 
       - name: Install dependencies with vcpkg
         run: |
