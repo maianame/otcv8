@@ -65,6 +65,9 @@ jobs:
           $vcpkgCommitId=$json.'builtin-baseline'
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
           echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" >> $GITHUB_ENV
+          
+      - name: Verify VCPKG_GIT_COMMIT_ID
+        run: echo "VCPKG_GIT_COMMIT_ID=${{ env.VCPKG_GIT_COMMIT_ID }}"
 
       - name: Install vcpkg
         uses: lukka/run-vcpkg@v2
@@ -80,18 +83,25 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v2
         with:
-          version: '3.21.1'  # Versão específica do CMake
+          version: '3.21.1'
 
       - name: Install dependencies with vcpkg
         run: |
-          ./vcpkg install <required-package>  # Adicione os pacotes necessários para o seu projeto
-          ./vcpkg integrate install  # Faz a integração do vcpkg no CMake
+          ./vcpkg install boost-filesystem boost-system
+          ./vcpkg integrate install
 
       - name: Run CMake and build project
         uses: lukka/run-cmake@v2
         with:
           configurePreset: ${{ matrix.buildtype }}
           buildPreset: ${{ matrix.buildtype }}
+
+      - name: Check if otclient.exe exists
+        run: |
+          if [ ! -f "${{ github.workspace }}/otclient.exe" ]; then
+            echo "Error: otclient.exe not found!"
+            exit 1
+          fi
 
       - name: Create and Upload Artifact
         uses: actions/upload-artifact@main
