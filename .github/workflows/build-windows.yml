@@ -1,4 +1,3 @@
----
 name: Build - Windows
 
 on:
@@ -67,17 +66,28 @@ jobs:
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
           echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Get vcpkg commit id from vcpkg.json
-        uses: lukka/run-vcpkg@main
+      - name: Install vcpkg
+        uses: lukka/run-vcpkg@v2022.07.21
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ env.VCPKG_GIT_COMMIT_ID }}
 
-      - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@main
+      - name: Install Ninja
+        run: |
+          choco install ninja
 
-      - name:  Run CMake and build project
-        uses: lukka/run-cmake@main
+      - name: Install CMake
+        uses: lukka/get-cmake@v2
+        with:
+          version: '3.21.1'  # Versão específica do CMake
+
+      - name: Install dependencies with vcpkg
+        run: |
+          ./vcpkg install <required-package>  # Adicione os pacotes necessários para o seu projeto
+          ./vcpkg integrate install  # Faz a integração do vcpkg no CMake
+
+      - name: Run CMake and build project
+        uses: lukka/run-cmake@v2
         with:
           configurePreset: ${{ matrix.buildtype }}
           buildPreset: ${{ matrix.buildtype }}
