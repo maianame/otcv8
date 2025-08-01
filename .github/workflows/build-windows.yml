@@ -67,7 +67,7 @@ jobs:
           echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Install vcpkg
-        uses: lukka/run-vcpkg@v2022.07.21
+        uses: lukka/run-vcpkg@v2
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ env.VCPKG_GIT_COMMIT_ID }}
