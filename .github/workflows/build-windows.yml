@@ -64,13 +64,14 @@ jobs:
           $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
           $vcpkgCommitId=$json.'builtin-baseline'
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
-          echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" >> $GITHUB_ENV
 
       - name: Install vcpkg
         uses: lukka/run-vcpkg@v2
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ env.VCPKG_GIT_COMMIT_ID }}
+          vcpkgArguments: "install"
 
       - name: Install Ninja
         run: |
@@ -79,7 +80,7 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@v2
         with:
-          version: '3.21.1'  # Versão específica do CMake
+          version: '3.21.1'  # Especifica a versão do CMake
 
       - name: Install dependencies with vcpkg
         run: |
