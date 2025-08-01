@@ -1,4 +1,3 @@
----
 name: Build - Windows
 
 on:
@@ -59,7 +58,13 @@ jobs:
         if: contains( matrix.os, 'windows')
         run: rm -r -fo C:/mysql*
 
-      - name: Restore artifacts and install vcpkg
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg integrate install
+
+      - name: Get vcpkg commit id from vcpkg.json
         id: vcpkg-step
         run: |
           $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
@@ -67,20 +72,21 @@ jobs:
           Write-Host "vcpkg commit ID: $vcpkgCommitId"
           echo "VCPKG_GIT_COMMIT_ID=$vcpkgCommitId" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Get vcpkg commit id from vcpkg.json
-        uses: lukka/run-vcpkg@main
-        with:
-          vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
-          vcpkgGitCommitId: ${{ env.VCPKG_GIT_COMMIT_ID }}
+      - name: Install dependencies with vcpkg
+        run: |
+          .\vcpkg install <your-dependency>
 
-      - name: Get latest CMake and ninja
+      - name: Get latest CMake
         uses: lukka/get-cmake@main
 
-      - name:  Run CMake and build project
-        uses: lukka/run-cmake@main
-        with:
-          configurePreset: ${{ matrix.buildtype }}
-          buildPreset: ${{ matrix.buildtype }}
+      - name: Install Ninja
+        run: |
+          choco install ninja
+
+      - name: Run CMake and build project with Ninja
+        run: |
+          cmake -S . -B build -G "Ninja"
+          cmake --build build --config Release
 
       - name: Create and Upload Artifact
         uses: actions/upload-artifact@main
